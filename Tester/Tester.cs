@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TestBus
@@ -27,14 +28,18 @@ namespace TestBus
             _container.Register(Component.For<IWindsorContainer>().Instance(_container));
             _conector = new Conector(_container, _moduleName);
             _conector.SetUp();
-
+            var sw = new Stopwatch();
+            sw.Start();
+            Console.WriteLine(_conector.Request<bool>("module1.create", new Trade { TradeDate = DateTime.Today, Account = new Random().Next(10000, 20000) }, TimeSpan.FromSeconds(3)));
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds);
 
             Task.Factory.StartNew(() =>
             {
                 while (true)
                 {
-                    _conector.Publish("module2.capture", new Trade { TradeDate = DateTime.Today, Account = new Random().Next(10000, 20000) });
-                    Thread.Sleep(1500);
+                    //_conector.Publish("module2.capture", new Trade { TradeDate = DateTime.Today, Account = new Random().Next(10000, 20000) });
+                    Thread.Sleep(15000);
                 }
             });
             Console.ReadKey();

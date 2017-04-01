@@ -68,10 +68,11 @@
                         else if (attr.GetType() == typeof(RespondAttribute))
                         {
                             topic.Name = topic.Name.ToLower(CultureInfo.InvariantCulture);
-                            Responders.Add(topic.Name, methodMetadata);
+                            Responders.Add(topic.Name.Replace("@",ModuleName), methodMetadata);
                         }
                     }
                 }
+                Listeners.Add($"{ModuleName}.callback", new MethodMetadata());
             }
         }
     }

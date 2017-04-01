@@ -1,0 +1,6 @@
+C:\roberto\_estudo\BusNeco\ServiceBus.Infra\bin\Debug\ServiceBus.Infra.dll
+C:\roberto\_estudo\BusNeco\ServiceBus.Infra\bin\Debug\ServiceBus.Infra.pdb
+C:\roberto\_estudo\BusNeco\ServiceBus.Infra\bin\Debug\Newtonsoft.Json.dll
+C:\roberto\_estudo\BusNeco\ServiceBus.Infra\bin\Debug\Newtonsoft.Json.xml
+C:\roberto\_estudo\BusNeco\ServiceBus.Infra\obj\Debug\ServiceBus.Infra.dll
+C:\roberto\_estudo\BusNeco\ServiceBus.Infra\obj\Debug\ServiceBus.Infra.pdb

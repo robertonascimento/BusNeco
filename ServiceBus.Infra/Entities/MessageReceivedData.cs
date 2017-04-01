@@ -15,9 +15,9 @@
         {
             return new MessageReceivedEventArgs
             {
-                ExpectedArgumentType = metadata.ExpectedArgumentType,
-                HandlerType = metadata.HandlerType,
-                Method = metadata.Method,
+                ExpectedArgumentType = metadata?.ExpectedArgumentType,
+                HandlerType = metadata?.HandlerType,
+                Method = metadata?.Method,
                 Data = data
             };
         }

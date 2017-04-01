@@ -1,7 +1,6 @@
 ﻿namespace ServiceBus.Channel.FileBroker
 {
     using System;
-    using System.Collections.Generic;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -11,7 +10,6 @@
     public class FileChannel : IChannel
     {
         private readonly IModuleCatalog _moduleCatalog;
-        private readonly Dictionary<string, Queue<IMessageData>> _queues = new Dictionary<string, Queue<IMessageData>>();
         private readonly Config _config;
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
@@ -36,12 +34,21 @@
                     Directory.CreateDirectory(path);
                 }
             }
+            foreach (var responder in _moduleCatalog.Responders)
+            {
+                var path = responder.Key.Replace(".", @"\");
+                path = Path.Combine(_config.RootPath, path);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+            }
             ListenQueues();
         }
 
         public void Close()
         {
-            _queues.Clear();
+            //
         }
 
         public void Publish(string topic, IMessageData data)
@@ -59,6 +66,34 @@
 
         private void ListenQueues()
         {
+            WatchListeners();
+            WatchResponders();
+        }
+
+        private void WatchResponders()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    foreach (var responder in _moduleCatalog.Responders)
+                    {
+                        var path = string.Empty + Path.Combine(_config.RootPath, responder.Key.Replace(".", @"\"));
+                        var files = Directory.GetFiles(path, "*.msg");
+                        foreach (var file in files)
+                        {
+                            var msg = file.FromJsonFile<MessageData>();
+                            MessageReceived?.Invoke(this, MessageReceivedEventArgs.Create(responder.Value, msg));
+                            File.Delete(file);
+                        }
+                    }
+                    Thread.Sleep(50);
+                }
+            });
+        }
+
+        private void WatchListeners()
+        {
             Task.Factory.StartNew(() =>
             {
                 while (true)
@@ -74,9 +109,10 @@
                             File.Delete(file);
                         }
                     }
-                    Thread.Sleep(1000);
+                    Thread.Sleep(50);
                 }
             });
         }
+
     }
 }

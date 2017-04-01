@@ -6,7 +6,6 @@ namespace TestBus.Test
     {
         public bool Create(Trade trade)
         {
-            Console.WriteLine(trade);
             return true;
         }
 

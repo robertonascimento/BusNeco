@@ -1,0 +1,10 @@
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Config\FileBrokerConfig.json
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Channel.FileBroker.dll
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Channel.FileBroker.pdb
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Infra.dll
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Newtonsoft.Json.dll
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Infra.pdb
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Newtonsoft.Json.xml
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.csprojResolveAssemblyReference.cache
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.dll
+C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.pdb

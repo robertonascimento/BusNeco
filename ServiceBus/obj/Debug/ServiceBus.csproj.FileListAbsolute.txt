@@ -1,0 +1,14 @@
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\ServiceBus.dll.config
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\ServiceBus.dll
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\ServiceBus.pdb
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\Castle.Core.dll
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\Castle.Windsor.dll
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\ServiceBus.Infra.dll
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\Newtonsoft.Json.dll
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\ServiceBus.Infra.pdb
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\Castle.Core.xml
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\Castle.Windsor.xml
+C:\roberto\_estudo\BusNeco\ServiceBus\bin\Debug\Newtonsoft.Json.xml
+C:\roberto\_estudo\BusNeco\ServiceBus\obj\Debug\ServiceBus.csprojResolveAssemblyReference.cache
+C:\roberto\_estudo\BusNeco\ServiceBus\obj\Debug\ServiceBus.dll
+C:\roberto\_estudo\BusNeco\ServiceBus\obj\Debug\ServiceBus.pdb

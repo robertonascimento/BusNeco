@@ -65,10 +65,6 @@
       <Project>{0d73b42a-aa37-4abd-bbf7-26a5b8edbd09}</Project>
       <Name>ServiceBus.Channel.FileBroker</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ServiceBus.Channel.RabbitMq\ServiceBus.Channel.RabbitMq.csproj">
-      <Project>{c192c351-a57a-48b5-b2eb-7d62982bdd60}</Project>
-      <Name>ServiceBus.Channel.RabbitMq</Name>
-    </ProjectReference>
     <ProjectReference Include="..\ServiceBus.Infra\ServiceBus.Infra.csproj">
       <Project>{A8C4C2E6-B3A1-4B9E-AB44-DDD94C2AABCB}</Project>
       <Name>ServiceBus.Infra</Name>
