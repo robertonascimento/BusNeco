@@ -8,6 +8,8 @@ namespace TestBus
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
     using ServiceBus;
+    using ServiceBus.Channel.RabbitMq;
+    using ServiceBus.Infra.Enums;
     using ServiceBus.Infra.Interfaces;
     using Test;
 
@@ -26,7 +28,7 @@ namespace TestBus
         {
             Console.WriteLine(_moduleName);
             _container.Register(Component.For<IWindsorContainer>().Instance(_container));
-            _conector = new Conector(_container, _moduleName);
+            _conector = new Conector(new RabbitMqChannel(), MessageEncodingType.Json);
             _conector.SetUp();
             var sw = new Stopwatch();
             sw.Start();

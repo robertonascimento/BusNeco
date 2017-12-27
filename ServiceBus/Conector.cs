@@ -5,140 +5,186 @@ namespace ServiceBus
 {
     using System.Collections.Generic;
     using System;
+    using System.Collections.Concurrent;
     using System.IO;
     using Infra.Entities;
     using Infra.Enums;
     using Infra.Interfaces;
     using System.Globalization;
+    using System.Linq;
     using System.Reflection;
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
     
     public class Conector : IConector
     {
-        private readonly IWindsorContainer _container;
-        private readonly ConectorSettings _settings;
-        private readonly IModuleCatalog _moduleCatalog;
-        private IList<IChannel> _channels;
-        private readonly IDictionary<string, object> _callbackObj;
-        
-        public Conector(IWindsorContainer container) 
-            : this(container, new ConectorSettings {EncodingType = MessageEncodingType.Json})
+        private readonly IChannel _channel;
+        private readonly MessageEncodingType _encondingTypeDefault;
+        private const string CALLBACK = "callback";
+        private const string NO_REPLY = "@no-reply";
+        private const string EXPECTED_ARGUMENT_TYPE = "ExpectedArgumentType";
+        private const string ACCEPT_ENCONDING = "accept-enconding";
+        private readonly IDictionary<string, MessageData> _callbackObj;
+        private HandlerCatalog _handlerCatalog;
+
+        public Conector(IChannel channel, MessageEncodingType encondingTypeDefault)
         {
+            _channel = channel;
+            _encondingTypeDefault = encondingTypeDefault;
+            _callbackObj = new ConcurrentDictionary<string, MessageData>();
         }
 
-        public Conector(IWindsorContainer container, string moduleName)
-            : this(container, new ConectorSettings { EncodingType = MessageEncodingType.Json }, moduleName)
+        public void SetUp(HandlerCatalog catalog)
         {
-        }
-
-        public Conector(IWindsorContainer container, ConectorSettings settings)
-        {
-            _container = container;
-            _settings = settings;
-            _moduleCatalog = new ModuleCatalog();
-            _callbackObj = new Dictionary<string, object>();
-        }
-
-        public Conector(IWindsorContainer container, ConectorSettings settings, string moduleName)
-        {
-            _container = container;
-            _settings = settings;
-            _moduleCatalog = new ModuleCatalog(moduleName);
-            _callbackObj = new Dictionary<string, object>();
+            SetUp();
+            _handlerCatalog = catalog;
+            _channel.AddBinders(_handlerCatalog.Binders);
+            _channel.OnMessageReceived += ProcessMessageReceived;
         }
 
         public void SetUp()
         {
-            var path = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            var classes = Classes.FromAssemblyInDirectory(new AssemblyFilter(path,"*"));
-            _moduleCatalog.AddAssembly(Assembly.GetCallingAssembly());
-            _container.Register(Component.For<IModuleCatalog>().Instance(_moduleCatalog));
-            _container.Register(classes.BasedOn<IChannel>().WithServiceAllInterfaces().LifestyleSingleton());
-            _container.Register(classes.BasedOn(_moduleCatalog.HandlersType).WithServiceAllInterfaces().LifestyleSingleton());
-            _channels = _container.ResolveAll<IChannel>();
-            foreach (var channel in _channels)
+            _channel.SetUp();
+        }
+
+        public void Publish<T>(string subject, T data)
+        {
+            var msg = data as MessageData;
+            if (msg != null)
             {
-                channel.SetUp();
-                channel.MessageReceived += MessageReceived;
+                _channel.Publish(subject, msg);
+            }
+            else
+            {
+                Publish(subject, data, _encondingTypeDefault);
             }
         }
 
-        public T Request<T>(string topic, object data, TimeSpan timeOut)
+        public void Publish<T>(string subject, T data, MessageEncodingType enconding)
+        {
+            Publish(subject, data, enconding, string.Empty, Guid.NewGuid().ToString(), string.Empty);
+        }
+
+        public void Publish<T>(string subject,
+            T data,
+            MessageEncodingType encodingType,
+            string callback,
+            string messageId,
+            string correlationId)
+        {
+            var msg = CreateMessageData(data, callback, messageId, correlationId, encodingType, null);
+            _channel.Publish(subject, msg);
+        }
+
+        public TReq Request<TReq>(string topic, object data, TimeSpan timeOut, string[] acceptsEnconding = null)
+        {
+            var msg = CreateMessageData(data, string.Empty, Guid.NewGuid().ToString(), string.Empty,
+                _encondingTypeDefault, acceptsEnconding);
+            var resp = Request(topic, msg, timeOut);
+            return resp.DecodeMessage<TReq>();
+        }
+
+        public MessageData Request(string subject, MessageData data, TimeSpan timeOut)
         {
             var evt = new ManualResetEvent(true);
-            var correlation = Guid.NewGuid().ToString();
-            Publish(topic, data, $"{_moduleCatalog.ModuleName}.callback", correlation);
+            var messageId = data.MessageId;
+            if (data.Headers != null)
+            {
+                data.Headers[CALLBACK] = _handlerCatalog?.DefaultCallback;
+            }
+            Publish(subject, data);
             while (evt.WaitOne(timeOut))
             {
-                if (_callbackObj.ContainsKey(correlation) && _callbackObj[correlation] is T)
-                {
-                    var ret = (T)_callbackObj[correlation];
-                    _callbackObj.Remove(correlation);
-                    return ret;
-                }
+                if (!_callbackObj.ContainsKey(messageId) || _callbackObj[messageId] == null) continue;
+                var ret = _callbackObj[messageId];
+                _callbackObj.Remove(messageId);
+                return ret;
             }
             throw new Exception("Request timeout");
         }
 
-        public void Publish(string topic, object data)
+        public MessageEncodingType GetAcceptEnconding(IDictionary<string, string> headers)
         {
-            Publish(topic, data, string.Empty, Guid.NewGuid().ToString());
+            var enconding = _encondingTypeDefault;
+            if (headers == null || !headers.ContainsKey(ACCEPT_ENCONDING))
+            {
+                return enconding;
+            }
+            foreach (var enc in headers[ACCEPT_ENCONDING].Split(','))
+            {
+                if (Enum.TryParse(enc, true, out enconding))
+                    break;
+            }
+            return enconding;
         }
 
-        private void Publish(string topic, object data, string replyTo, string correlationId)
+        private void ProcessMessageReceived(object sender, MessageReceivedEventArgs args)
         {
-            IMessageData output = null;
-            if (_settings.EncodingType == MessageEncodingType.Json)
+            if (!string.IsNullOrEmpty(args.Data.CorrelationId) &&
+                !_callbackObj.ContainsKey(args.Data.CorrelationId))
             {
-                output = data.ToJsonEncode();
-                output.ReplyTo = replyTo;
-                output.CorrelationId = correlationId;
-                output.Headers = new Dictionary<string, object> {{"ExpectedArgumentType", data.GetType()}};
+                _callbackObj.Add(args.Data.CorrelationId, args.Data);
             }
-            foreach (var channel in _channels)
+            if (args.Method == null || args.Data.GetHeader(CALLBACK) == NO_REPLY)
             {
-                channel.Publish(topic, output);
-            }
-        }
-        
-        private void MessageReceived(object sender, MessageReceivedEventArgs args)
-        {
-            var expectedArgumentType = args.ExpectedArgumentType;
-            if (expectedArgumentType == null && args.Data.Headers.ContainsKey("ExpectedArgumentType"))
-            {
-                expectedArgumentType = Type.GetType((string)args.Data.Headers["ExpectedArgumentType"]);
-            }
-            var value = DecodeMessage(args.Data, expectedArgumentType);
-            if (args.Method == null)
-            {
-                _callbackObj.Add(args.Data.CorrelationId, value);
                 return;
             }
-            var obj = _container.Resolve(args.HandlerType);
-            var ret = args.Method?.Invoke(obj, BindingFlags.Public, null, new[] { value }, CultureInfo.InvariantCulture);
-            if (ret != null)
+            var value = GetExpectedValue(args);
+            var obj = Activator.CreateInstance(args.HandlerType, this);
+            var parameters = new List<object>();
+            foreach (var p in args.Method.GetParameters())
             {
-                Publish(args.Data.ReplyTo, ret, "", args.Data.CorrelationId);
+                if (args.Data.Headers != null && p.ParameterType.IsInstanceOfType(args.Data.Headers))
+                {
+                    parameters.Add(args.Data.Headers);
+                }
+                if (p.ParameterType == value.GetType())
+                {
+                    parameters.Add(value);
+                }
+            }
+            var ret = args.Method.Invoke(obj, BindingFlags.Public, null, parameters.ToArray(),
+                CultureInfo.InvariantCulture);
+            if (ret != null && args.Data.GetHeader(CALLBACK) != null)
+            {
+                Publish(args.Data.GetHeader(CALLBACK),
+                    ret,
+                    GetAcceptEnconding(args.Data.Headers),
+                    NO_REPLY,
+                    Guid.NewGuid().ToString(),
+                    args.Data.MessageId);
             }
         }
 
-        private static object DecodeMessage(IMessageData data, Type expected)
+        private static MessageData CreateMessageData<T>(T data,
+            string callback,
+            string messageId,
+            string correlationId,
+            MessageEncodingType encodingType,
+            IEnumerable<string> acceptEnconding)
         {
-            object value = null;
-            if (expected != null &&
-                !string.IsNullOrEmpty(data.ContentType))
+            var output = data.CodeMessage(encodingType);
+            output.MessageId = messageId;
+            output.CorrelationId = correlationId;
+            output.Headers = new Dictionary<string, string>
             {
-                if (data.ContentType.ToLowerInvariant() == "application/json")
-                {
-                    value = data.FromJsonEncode(expected);
-                }
-            }
-            else
-            {
-                value = data.Body;
-            }
-            return value;
+                {EXPECTED_ARGUMENT_TYPE, data.GetType().Name},
+                {CALLBACK, callback},
+                {ACCEPT_ENCONDING, acceptEnconding?.Aggregate((c, n) => $"{c},{n}")}
+            };
+            return output;
+        }
+
+        private static object GetExpectedValue(MessageReceivedEventArgs args)
+        {
+            var expectedArgumentType =
+                args.ExpectedArgumentType ?? Type.GetType(args.Data.GetHeader(EXPECTED_ARGUMENT_TYPE));
+            return args.Data.DecodeMessage(expectedArgumentType);
+        }
+
+        public void Dispose()
+        {
+            _channel?.Close();
         }
     }
 }

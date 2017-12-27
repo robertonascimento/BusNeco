@@ -6,7 +6,7 @@
 
     public class MethodMetadata
     {
-        public IHandlerInfo HandlerInfo { get; set; }
+        public IMemberInfo HandlerInfo { get; set; }
         public Type HandlerType { get; set; }
         public IMemberInfo MethodInfo { get; set; }
         public MethodInfo Method { get; set; }

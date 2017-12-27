@@ -30,18 +30,31 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LZ4, Version=1.0.15.93, Culture=neutral, PublicKeyToken=62e1b5ec1eec9bdd, processorArchitecture=MSIL">
+      <HintPath>..\packages\lz4net.1.0.15.93\lib\net4-client\LZ4.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="ZeroFormatter, Version=1.6.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZeroFormatter.1.6.4\lib\net45\ZeroFormatter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ZeroFormatter.Interfaces, Version=1.6.4.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ZeroFormatter.Interfaces.1.6.4\lib\net45\ZeroFormatter.Interfaces.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\HandlerAttribute.cs" />
     <Compile Include="Attributes\ListenAttribute.cs" />
     <Compile Include="Attributes\RespondAttribute.cs" />
     <Compile Include="Entities\ConectorSettings.cs" />
+    <Compile Include="Entities\IContextHandler.cs" />
     <Compile Include="Entities\ModuleCatalog.cs" />
     <Compile Include="Entities\JsonHelper.cs" />
     <Compile Include="Entities\MessageData.cs" />
@@ -50,9 +63,6 @@
     <Compile Include="Enums\MessageEncodingType.cs" />
     <Compile Include="Interfaces\IChannel.cs" />
     <Compile Include="Interfaces\IConector.cs" />
-    <Compile Include="Interfaces\IHandlerInfo.cs" />
-    <Compile Include="Interfaces\IModuleCatalog.cs" />
-    <Compile Include="Interfaces\IMessageData.cs" />
     <Compile Include="Interfaces\IMemberInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

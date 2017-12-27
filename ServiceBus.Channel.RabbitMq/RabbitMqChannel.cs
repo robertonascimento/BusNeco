@@ -1,114 +1,145 @@
-﻿namespace ServiceBus.Channel.RabbitMq
-{
+﻿namespace ServiceBus.Channel.RabbitMq {
     using Infra.Entities;
     using Infra.Interfaces;
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Text;
     using RabbitMQ.Client;
     using RabbitMQ.Client.Events;
 
-    public class RabbitMqChannel : IChannel
-    {
-        private readonly IModuleCatalog _moduleCatalog;
+    public class RabbitMqChannel : IChannel {
         private IConnection _connection;
         private IModel _channel;
         private readonly Config _config;
+        public event EventHandler<MessageReceivedEventArgs> OnMessageReceived;
+        public string ChannelId { get; }
 
-        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+        public RabbitMqChannel() : this(@"Config\RabbitChannelConfig.json".FromJsonFile<Config>()) { }
 
-        public RabbitMqChannel(IModuleCatalog catalog)
-        {
-            _moduleCatalog = catalog;
-            _config = @"Config\RabbitChannelConfig.json".FromJsonFile<Config>();
+        public RabbitMqChannel(Config config) {
+            _config = config;
+            ChannelId = Guid.NewGuid().ToString();
         }
 
-        public void Publish(string topic, IMessageData data)
-        {
+        public void Publish(string subject, MessageData data) {
+            if (_channel == null) {
+                throw new Exception("You must run SetUp() first");
+            }
             var props = _channel.CreateBasicProperties();
-            props.CorrelationId = Guid.NewGuid().ToString();
             props.ContentType = data.ContentType;
-            _channel.BasicPublish(exchange: _config.ExchangeName,
-                                 routingKey: $"{_config.ExchangeName}.{topic}",
-                                 basicProperties: props,
-                                 body: data.Body);
+            props.MessageId = data.MessageId;
+            if (data.CorrelationId != null) {
+                props.CorrelationId = data.CorrelationId;
+            }
+            props.Headers = new Dictionary<string, object>();
+            foreach (var kv in data.Headers) {
+                if (kv.Value != null) {
+                    props.Headers.Add(kv.Key, kv.Value);
+                }
+            }
+            _channel.BasicPublish(_config.ExchangeName,
+                subject,
+                props,
+                data.Body);
         }
 
-        public void SetUp()
-        {
+        public MessageData Request(string subject, MessageData data, TimeSpan timeOut) {
+            throw new NotImplementedException();
+        }
+
+        public void SetUp() {
             CreateConnection();
-            AddResponders();
-            AddListeners();
         }
 
-        public void Close()
-        {
-            _channel?.Dispose();
-            _connection?.Close();
-        }
-
-        private void CreateConnection()
-        {
-            var factory = new ConnectionFactory
-            {
+        public void CreateConnection() {
+            var factory = new ConnectionFactory {
                 UserName = _config.UserLogin,
                 Password = _config.Password,
                 HostName = _config.ServerName,
-                Port = AmqpTcpEndpoint.UseDefaultPort
+                VirtualHost = _config.VirtualHost ?? "/",
+                Port = _config.Port ?? AmqpTcpEndpoint.UseDefaultPort
             };
-            _connection = factory.CreateConnection();
+            var version = FileVersionInfo.GetVersionInfo(factory.GetType().Assembly.Location).FileVersion;
+            var connName = $"{_config.QueueName ?? ""}@{Environment.MachineName} (version: {version})";
+            _connection = factory.CreateConnection(connName);
             _channel = _connection.CreateModel();
-            _channel.ExchangeDeclare(_config.ExchangeName, ExchangeType.Topic);
-            _channel.QueueDeclare(_moduleCatalog.ModuleName, false, false, false, null);
-        }
-
-        private void AddResponders()
-        {
-            foreach (var listener in _moduleCatalog.Responders)
-            {
-                var routingKey = listener.Key.StartsWith(_config.ExchangeName) ? listener.Key : $"{_config.ExchangeName}.{listener.Key}";
-                routingKey = routingKey.Replace("@", _moduleCatalog.ModuleName);
-                _channel.QueueBind(_moduleCatalog.ModuleName, _config.ExchangeName, routingKey, null);
+            _channel.BasicQos(0, 1, true);
+            if (_config.DeclareExchange) {
+                _channel.ExchangeDeclare(_config.ExchangeName,
+                    _config.ExchangeType ?? ExchangeType.Direct,
+                    _config.ExchangeDurable,
+                    _config.ExchangeAutoDelete);
+            }
+            if (_config.DeclareQueue) {
+                _channel.QueueDeclare(_config.QueueName,
+                    _config.QueueDurable,
+                    false,
+                    _config.QueueAutoDelete,
+                    null);
             }
         }
 
-        private void AddListeners()
-        {
-            foreach (var listener in _moduleCatalog.Listeners)
-            {
-                var routingKey = listener.Key.StartsWith(_config.ExchangeName) ? listener.Key : $"{_config.ExchangeName}.{listener.Key}";
-                _channel.QueueBind(_moduleCatalog.ModuleName, _config.ExchangeName, routingKey, null);
-                var consumer = new EventingBasicConsumer(_channel);
-                _channel.BasicConsume(queue: _moduleCatalog.ModuleName, noAck: false, consumer: consumer);
-                consumer.Received += (model, ea) =>
-                {
-                    var msg = new MessageData
-                    {
-                        Body = ea.Body,
-                        ContentEncoding = ea.BasicProperties.ContentEncoding,
-                        ContentType = ea.BasicProperties.ContentType,
-                        CorrelationId = ea.BasicProperties.CorrelationId,
-                        DeliveryMode = ea.BasicProperties.DeliveryMode,
-                        Expiration = ea.BasicProperties.Expiration,
-                        Headers = ea.BasicProperties.Headers,
-                        MessageId = ea.BasicProperties.MessageId,
-                        Persistent = ea.BasicProperties.Persistent,
-                        Priority = ea.BasicProperties.Priority,
-                        ReplyTo = ea.BasicProperties.ReplyTo,
-                        Type = ea.BasicProperties.Type,
-                        UserId = ea.BasicProperties.UserId
-                    };
-                    try
-                    {
-                        MessageReceived?.Invoke(this, MessageReceivedEventArgs.Create(listener.Value, msg));
-                        _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new Exception("Message received error", ex);
-                    }
+        public void AddBinders(IDictionary<string, MethodMetadata> binders) {
+            if (_config.QueueName == null) return;
 
-                };
+            var consumer = new EventingBasicConsumer(_channel) {ConsumerTag = _config.QueueName};
+
+            foreach (var binder in binders) {
+                var routingKey = binder.Key;
+                _channel.QueueBind(_config.QueueName, _config.ExchangeName, routingKey, null);
             }
+            consumer.Received += (model, ea) => {
+                try {
+                    var msg = CreateMessageData(ea);
+                    foreach (var binder in binders) {
+                        if (binder.Value?.MethodInfo != null &&
+                            !ea.RoutingKey.EndsWith(binder.Value.MethodInfo.Name)) {
+                            continue;
+                        }
+                        OnMessageReceived?.Invoke(this, MessageReceivedEventArgs.Create(binder.Value, msg));
+                    }
+                }
+                catch (Exception ex) {
+                    throw new Exception("Message received error", ex);
+                }
+                finally {
+                    _channel.BasicAck(ea.DeliveryTag, true);
+                }
+            };
+            _channel.BasicConsume(_config.QueueName, false, consumer.ConsumerTag, consumer);
         }
 
+        private static MessageData CreateMessageData(BasicDeliverEventArgs ea) {
+            var msg = new MessageData {
+                Body = ea.Body,
+                ContentEncoding = ea.BasicProperties.ContentEncoding,
+                ContentType = ea.BasicProperties.ContentType,
+                CorrelationId = ea.BasicProperties.CorrelationId,
+                DeliveryMode = ea.BasicProperties.DeliveryMode,
+                Expiration = ea.BasicProperties.Expiration,
+                MessageId = ea.BasicProperties.MessageId,
+                Persistent = ea.BasicProperties.Persistent,
+                Priority = ea.BasicProperties.Priority,
+                ReplyTo = ea.BasicProperties.ReplyTo,
+                Type = ea.BasicProperties.Type,
+                UserId = ea.BasicProperties.UserId,
+                Headers = new Dictionary<string, string>()
+            };
+            if (ea.BasicProperties.Headers == null)
+                return msg;
+
+            foreach (var kv in ea.BasicProperties.Headers) {
+                if (kv.Value != null) {
+                    msg.Headers.Add(kv.Key, Encoding.UTF8.GetString((byte[]) kv.Value));
+                }
+            }
+            return msg;
+        }
+
+        public void Close() {
+            _channel?.Dispose();
+            _connection?.Close();
+        }
     }
 }

@@ -8,42 +8,50 @@
     using Attributes;
     using Interfaces;
 
-    public class ModuleCatalog : IModuleCatalog
+    public class HandlerCatalog
     {
-        public string ModuleName { get; set; }
-        public IDictionary<string, MethodMetadata> Listeners { get; set; }
-        public IDictionary<string, MethodMetadata> Responders { get; set; }
+        public string DefaultCallback { get; set; }
+        public IDictionary<string, MethodMetadata> Binders { get; set; }
         public List<Type> HandlersType { get; set; }
 
-        public ModuleCatalog(string moduleName) : this()
+        public HandlerCatalog()
         {
-            ModuleName = moduleName;
-        }
-
-        public ModuleCatalog()
-        {
-            ModuleName = Assembly.GetExecutingAssembly().FullName;
-            Listeners = new Dictionary<string, MethodMetadata>();
-            Responders = new Dictionary<string, MethodMetadata>();
-            HandlersType  = new List<Type>();
+            Binders = new Dictionary<string, MethodMetadata>();
+            HandlersType = new List<Type>();
         }
 
         /// <summary>
         /// Add the assembly with Handlers on catalog
         /// </summary>
         /// <param name="assembly">The assembly</param>
-        public void AddAssembly(Assembly assembly)
+        public HandlerCatalog AddAssembly(Assembly assembly)
         {
-            var types = (from type in assembly.GetTypes() where Attribute.IsDefined(type, typeof(HandlerAttribute)) select type).ToList();
+            if (assembly == null) return this;
+            var types = QueryHandler(assembly.GetTypes());
             HandlersType.AddRange(types);
-            foreach (var type in types)
+            return this;
+        }
+
+        public HandlerCatalog AddInstance(params IContextHandler[] context)
+        {
+            if (context == null) return this;
+            var types = QueryHandler(context.Select(it => it.GetType()));
+            HandlersType.AddRange(types);
+            return this;
+        }
+
+        public void Load()
+        {
+            foreach (var type in HandlersType)
             {
-                var handler = type.GetCustomAttributes(false).FirstOrDefault(f => f.GetType() == typeof(HandlerAttribute)) as IHandlerInfo;
+                var handler =
+                    type.GetCustomAttributes(false)
+                        .FirstOrDefault(f => f.GetType() == typeof(HandlerAttribute)) as IMemberInfo;
                 if (handler == null)
                 {
                     continue;
                 }
-                
+
                 foreach (var method in type.GetMethods())
                 {
                     foreach (var attr in method.GetCustomAttributes(false))
@@ -53,6 +61,7 @@
                         {
                             continue;
                         }
+                        topic.Name = topic.Name.ToLower(CultureInfo.InvariantCulture).Replace("@", handler.Name);
                         var methodMetadata = new MethodMetadata
                         {
                             HandlerInfo = handler,
@@ -61,18 +70,29 @@
                             MethodInfo = topic,
                             ExpectedArgumentType = method.GetParameters().FirstOrDefault()?.ParameterType
                         };
-                        if (attr.GetType() == typeof(ListenAttribute))
+                        if (attr.GetType() == typeof(ListenAttribute) || attr.GetType() == typeof(RespondAttribute))
                         {
-                            Listeners.Add(topic.Name.ToLower(CultureInfo.InvariantCulture), methodMetadata);
-                        }
-                        else if (attr.GetType() == typeof(RespondAttribute))
-                        {
-                            topic.Name = topic.Name.ToLower(CultureInfo.InvariantCulture);
-                            Responders.Add(topic.Name.Replace("@",ModuleName), methodMetadata);
+                            AddBinder(topic.Name, methodMetadata);
                         }
                     }
                 }
-                Listeners.Add($"{ModuleName}.callback", new MethodMetadata());
+                DefaultCallback = $"{handler.Name}.callback";
+                AddBinder(DefaultCallback, new MethodMetadata());
+            }
+        }
+
+        private IEnumerable<Type> QueryHandler(IEnumerable<Type> types)
+        {
+            return from type in types
+                   where Attribute.IsDefined(type, typeof(HandlerAttribute))
+                   select type;
+        }
+
+        private void AddBinder(string key, MethodMetadata value)
+        {
+            if (!Binders.ContainsKey(key))
+            {
+                Binders.Add(key, value);
             }
         }
     }

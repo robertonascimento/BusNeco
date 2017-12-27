@@ -2,7 +2,10 @@
 {
     public enum MessageEncodingType
     {
-        ByteArray = 0,
-        Json = 1,
+        ByteArray,
+        Json,
+        JsonLz4,
+        ZeroFormatter,
+        ZeroFormatterLz4,
     }
 }

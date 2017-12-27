@@ -3,7 +3,7 @@ namespace TestBus.Test
 {
     using ServiceBus.Infra.Attributes;
 
-    [Handler]
+    [Handler("module1")]
     public interface ITradeManager
     {
         [Respond("@.create")]

@@ -1,6 +1,7 @@
 ﻿namespace ServiceBus.Channel.FileBroker
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
@@ -9,15 +10,17 @@
 
     public class FileChannel : IChannel
     {
-        private readonly IModuleCatalog _moduleCatalog;
+        private readonly HandlerCatalog _moduleCatalog;
         private readonly Config _config;
         public event EventHandler<MessageReceivedEventArgs> MessageReceived;
 
-        public FileChannel(IModuleCatalog moduleCatalog)
+        public FileChannel(HandlerCatalog moduleCatalog)
         {
             _moduleCatalog = moduleCatalog;
             _config = @"Config\FileBrokerConfig.json".FromJsonFile<Config>();
         }
+
+        public string ChannelId { get; }
 
         public void SetUp()
         {
@@ -25,7 +28,7 @@
             {
                 Directory.CreateDirectory(_config.RootPath);
             }
-            foreach (var listener in _moduleCatalog.Listeners)
+            foreach (var listener in _moduleCatalog.Binders)
             {
                 var path = listener.Key.Replace(".", @"\");
                 path = Path.Combine(_config.RootPath, path);
@@ -34,7 +37,7 @@
                     Directory.CreateDirectory(path);
                 }
             }
-            foreach (var responder in _moduleCatalog.Responders)
+            foreach (var responder in _moduleCatalog.Binders)
             {
                 var path = responder.Key.Replace(".", @"\");
                 path = Path.Combine(_config.RootPath, path);
@@ -51,7 +54,18 @@
             //
         }
 
-        public void Publish(string topic, IMessageData data)
+        public event EventHandler<MessageReceivedEventArgs> OnMessageReceived;
+
+        
+        public MessageData Request(string subject, MessageData data, TimeSpan timeOut) {
+            throw new NotImplementedException();
+        }
+
+        public void AddBinders(IDictionary<string, MethodMetadata> binders) {
+            throw new NotImplementedException();
+        }
+
+        public void Publish(string topic, MessageData data)
         {
             var path = topic.Replace(".", @"\");
             path = Path.Combine(_config.RootPath, path);
@@ -76,7 +90,7 @@
             {
                 while (true)
                 {
-                    foreach (var responder in _moduleCatalog.Responders)
+                    foreach (var responder in _moduleCatalog.Binders)
                     {
                         var path = string.Empty + Path.Combine(_config.RootPath, responder.Key.Replace(".", @"\"));
                         var files = Directory.GetFiles(path, "*.msg");
@@ -98,7 +112,7 @@
             {
                 while (true)
                 {
-                    foreach (var listener in _moduleCatalog.Listeners)
+                    foreach (var listener in _moduleCatalog.Binders)
                     {
                         var path = string.Empty + Path.Combine(_config.RootPath, listener.Key.Replace(".", @"\"));
                         var files = Directory.GetFiles(path, "*.msg");

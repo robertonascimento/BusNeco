@@ -8,3 +8,6 @@ C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Newtonsoft.Js
 C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.csprojResolveAssemblyReference.cache
 C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.dll
 C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.pdb
+C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ZeroFormatter.dll
+C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\LZ4.dll
+C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ZeroFormatter.Interfaces.dll

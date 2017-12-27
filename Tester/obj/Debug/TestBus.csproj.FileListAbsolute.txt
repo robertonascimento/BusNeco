@@ -17,3 +17,11 @@ C:\roberto\_estudo\BusNeco\Tester\bin\Debug\Newtonsoft.Json.xml
 C:\roberto\_estudo\BusNeco\Tester\obj\Debug\TestBus.csprojResolveAssemblyReference.cache
 C:\roberto\_estudo\BusNeco\Tester\obj\Debug\TestBus.exe
 C:\roberto\_estudo\BusNeco\Tester\obj\Debug\TestBus.pdb
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\Config\RabbitChannelConfig.json
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\ServiceBus.Channel.RabbitMq.dll
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\RabbitMQ.Client.dll
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\ZeroFormatter.dll
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\LZ4.dll
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\ZeroFormatter.Interfaces.dll
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\ServiceBus.Channel.RabbitMq.pdb
+C:\Roberto\_estudo\BusNeco\Tester\bin\Debug\RabbitMQ.Client.xml

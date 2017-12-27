@@ -4,18 +4,14 @@
     using Interfaces;
 
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Class, AllowMultiple = true)]
-    public class HandlerAttribute : Attribute, IHandlerInfo
+    public class HandlerAttribute : Attribute, IMemberInfo
     {
-        public string[] Consumers { get; set; }
+        public string Name { get; set; }
 
-        public HandlerAttribute()
+        public HandlerAttribute(string name)
         {
+            Name = name;
         }
 
-        public HandlerAttribute(string[] consumers)
-        {
-            Consumers = consumers;
-        }
-        
     }
 }
