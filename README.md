@@ -1,5 +1,6 @@
 # BusNeco
-Pacote que facilita o uso do RabbitMQ, através do uso de Atributes
+
+The easy way to use RabbitMQ on .NET solutions.
 
 
 Copyright
