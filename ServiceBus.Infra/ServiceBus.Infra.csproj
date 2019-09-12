@@ -53,9 +53,8 @@
     <Compile Include="Attributes\HandlerAttribute.cs" />
     <Compile Include="Attributes\ListenAttribute.cs" />
     <Compile Include="Attributes\RespondAttribute.cs" />
-    <Compile Include="Entities\ConectorSettings.cs" />
     <Compile Include="Entities\IContextHandler.cs" />
-    <Compile Include="Entities\ModuleCatalog.cs" />
+    <Compile Include="Entities\HandlerCatalog.cs" />
     <Compile Include="Entities\JsonHelper.cs" />
     <Compile Include="Entities\MessageData.cs" />
     <Compile Include="Entities\MessageReceivedData.cs" />

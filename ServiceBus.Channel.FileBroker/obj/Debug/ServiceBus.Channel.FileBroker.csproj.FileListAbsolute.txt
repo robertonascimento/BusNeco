@@ -11,3 +11,15 @@ C:\roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Ch
 C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ZeroFormatter.dll
 C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\LZ4.dll
 C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ZeroFormatter.Interfaces.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Channel.FileBroker.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Channel.FileBroker.pdb
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Infra.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ZeroFormatter.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\LZ4.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Newtonsoft.Json.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ZeroFormatter.Interfaces.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Infra.pdb
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Newtonsoft.Json.xml
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.csprojResolveAssemblyReference.cache
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.dll
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.pdb

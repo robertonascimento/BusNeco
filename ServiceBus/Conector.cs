@@ -13,8 +13,6 @@ namespace ServiceBus
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    using Castle.MicroKernel.Registration;
-    using Castle.Windsor;
     
     public class Conector : IConector
     {
@@ -36,17 +34,12 @@ namespace ServiceBus
 
         public void SetUp(HandlerCatalog catalog)
         {
-            SetUp();
+            _channel.SetUp();
             _handlerCatalog = catalog;
             _channel.AddBinders(_handlerCatalog.Binders);
             _channel.OnMessageReceived += ProcessMessageReceived;
         }
-
-        public void SetUp()
-        {
-            _channel.SetUp();
-        }
-
+        
         public void Publish<T>(string subject, T data)
         {
             var msg = data as MessageData;
@@ -106,7 +99,7 @@ namespace ServiceBus
         public MessageEncodingType GetAcceptEnconding(IDictionary<string, string> headers)
         {
             var enconding = _encondingTypeDefault;
-            if (headers == null || !headers.ContainsKey(ACCEPT_ENCONDING))
+            if (headers == null || !headers.ContainsKey(ACCEPT_ENCONDING) || string.IsNullOrEmpty(headers[ACCEPT_ENCONDING]))
             {
                 return enconding;
             }
@@ -130,7 +123,11 @@ namespace ServiceBus
                 return;
             }
             var value = GetExpectedValue(args);
-            var obj = Activator.CreateInstance(args.HandlerType, this);
+            IContextHandler obj = null;
+            if (_handlerCatalog.Handlers.ContainsKey(args.HandlerType.FullName))
+            {
+                obj = _handlerCatalog.Handlers[args.HandlerType.FullName];
+            }
             var parameters = new List<object>();
             foreach (var p in args.Method.GetParameters())
             {

@@ -13,3 +13,17 @@ C:\roberto\_estudo\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Chan
 C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ZeroFormatter.dll
 C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\LZ4.dll
 C:\Roberto\_estudo\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ZeroFormatter.Interfaces.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ServiceBus.Channel.RabbitMq.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ServiceBus.Channel.RabbitMq.pdb
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\RabbitMQ.Client.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ServiceBus.Infra.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ZeroFormatter.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\LZ4.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\Newtonsoft.Json.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ZeroFormatter.Interfaces.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ServiceBus.Infra.pdb
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\RabbitMQ.Client.xml
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\Newtonsoft.Json.xml
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.csprojResolveAssemblyReference.cache
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.dll
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.pdb

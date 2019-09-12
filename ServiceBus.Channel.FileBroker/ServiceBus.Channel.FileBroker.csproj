@@ -42,7 +42,6 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="FileChannel.cs" />
-    <Compile Include="MemChannel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -50,11 +49,6 @@
       <Project>{a8c4c2e6-b3a1-4b9e-ab44-ddd94c2aabcb}</Project>
       <Name>ServiceBus.Infra</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Config\FileBrokerConfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

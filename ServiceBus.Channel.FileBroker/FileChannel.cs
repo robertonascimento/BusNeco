@@ -12,7 +12,7 @@
     {
         private readonly HandlerCatalog _moduleCatalog;
         private readonly Config _config;
-        public event EventHandler<MessageReceivedEventArgs> MessageReceived;
+       
 
         public FileChannel(HandlerCatalog moduleCatalog)
         {
@@ -62,7 +62,7 @@
         }
 
         public void AddBinders(IDictionary<string, MethodMetadata> binders) {
-            throw new NotImplementedException();
+  
         }
 
         public void Publish(string topic, MessageData data)
@@ -97,7 +97,7 @@
                         foreach (var file in files)
                         {
                             var msg = file.FromJsonFile<MessageData>();
-                            MessageReceived?.Invoke(this, MessageReceivedEventArgs.Create(responder.Value, msg));
+                            OnMessageReceived?.Invoke(this, MessageReceivedEventArgs.Create(responder.Value, msg));
                             File.Delete(file);
                         }
                     }
@@ -119,7 +119,7 @@
                         foreach (var file in files)
                         {
                             var msg = file.FromJsonFile<MessageData>();
-                            MessageReceived?.Invoke(this, MessageReceivedEventArgs.Create(listener.Value, msg));
+                            OnMessageReceived?.Invoke(this, MessageReceivedEventArgs.Create(listener.Value, msg));
                             File.Delete(file);
                         }
                     }

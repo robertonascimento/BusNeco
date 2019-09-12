@@ -12,37 +12,31 @@
     {
         public string DefaultCallback { get; set; }
         public IDictionary<string, MethodMetadata> Binders { get; set; }
-        public List<Type> HandlersType { get; set; }
+        public Dictionary<string, IContextHandler> Handlers { get; set; }
 
         public HandlerCatalog()
         {
             Binders = new Dictionary<string, MethodMetadata>();
-            HandlersType = new List<Type>();
-        }
-
-        /// <summary>
-        /// Add the assembly with Handlers on catalog
-        /// </summary>
-        /// <param name="assembly">The assembly</param>
-        public HandlerCatalog AddAssembly(Assembly assembly)
-        {
-            if (assembly == null) return this;
-            var types = QueryHandler(assembly.GetTypes());
-            HandlersType.AddRange(types);
-            return this;
+            Handlers = new Dictionary<string, IContextHandler>();
         }
 
         public HandlerCatalog AddInstance(params IContextHandler[] context)
         {
             if (context == null) return this;
-            var types = QueryHandler(context.Select(it => it.GetType()));
-            HandlersType.AddRange(types);
+            foreach (var ctx in context)
+            {
+                var type = ctx.GetType();
+                if (Attribute.IsDefined(type, typeof(HandlerAttribute)))
+                {
+                    Handlers.Add(type.FullName, ctx);
+                }
+            }            
             return this;
         }
 
-        public void Load()
+        public HandlerCatalog Load()
         {
-            foreach (var type in HandlersType)
+            foreach (var type in Handlers.Values.Select(it=>it.GetType()))
             {
                 var handler =
                     type.GetCustomAttributes(false)
@@ -79,13 +73,7 @@
                 DefaultCallback = $"{handler.Name}.callback";
                 AddBinder(DefaultCallback, new MethodMetadata());
             }
-        }
-
-        private IEnumerable<Type> QueryHandler(IEnumerable<Type> types)
-        {
-            return from type in types
-                   where Attribute.IsDefined(type, typeof(HandlerAttribute))
-                   select type;
+            return this;
         }
 
         private void AddBinder(string key, MethodMetadata value)

@@ -9,7 +9,6 @@ namespace ServiceBus.Infra.Interfaces
     public interface IConector
     {
         void SetUp(HandlerCatalog catalog);
-        void SetUp();
         MessageEncodingType GetAcceptEnconding(IDictionary<string, string> headers);
         void Publish<T>(string subject, T data);
         void Publish<T>(string subject, T data, MessageEncodingType enconding);

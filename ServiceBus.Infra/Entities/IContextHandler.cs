@@ -1,7 +1,7 @@
 ﻿namespace ServiceBus.Infra.Entities {
     using System;
 
-    public interface IContextHandler : IDisposable
+    public interface IContextHandler 
     {
     }
 }

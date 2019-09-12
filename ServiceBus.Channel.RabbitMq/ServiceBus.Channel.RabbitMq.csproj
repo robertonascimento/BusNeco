@@ -44,9 +44,6 @@
     <Compile Include="RabbitMqChannel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Config\RabbitChannelConfig.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
