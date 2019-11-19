@@ -56,13 +56,17 @@
                             continue;
                         }
                         topic.Name = topic.Name.ToLower(CultureInfo.InvariantCulture).Replace("@", handler.Name);
+                        var param = method.GetParameters().FirstOrDefault()?.ParameterType;
+                        if (param != null && (!param.IsGenericType || param.GetGenericTypeDefinition() != typeof(BusMessageContext<>)))
+                            throw new Exception($"The first method parameter should be a type of {nameof(IBusMessageContext)}");
+
                         var methodMetadata = new MethodMetadata
                         {
                             HandlerInfo = handler,
                             HandlerType = type,
                             Method = method,
                             MethodInfo = topic,
-                            ExpectedArgumentType = method.GetParameters().FirstOrDefault()?.ParameterType
+                            ExpectedArgumentType = param.GetGenericArguments().FirstOrDefault()
                         };
                         if (attr.GetType() == typeof(ListenAttribute) || attr.GetType() == typeof(RespondAttribute))
                         {

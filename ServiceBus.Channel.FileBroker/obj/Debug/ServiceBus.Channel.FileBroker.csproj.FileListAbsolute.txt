@@ -20,6 +20,7 @@ C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Newtonsoft.Json.dll
 C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ZeroFormatter.Interfaces.dll
 C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\ServiceBus.Infra.pdb
 C:\git\BusNeco\ServiceBus.Channel.FileBroker\bin\Debug\Newtonsoft.Json.xml
-C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.csprojResolveAssemblyReference.cache
 C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.dll
 C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.pdb
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.csprojAssemblyReference.cache
+C:\git\BusNeco\ServiceBus.Channel.FileBroker\obj\Debug\ServiceBus.Channel.FileBroker.csproj.CopyComplete

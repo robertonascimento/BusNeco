@@ -15,6 +15,7 @@ C:\git\BusNeco\ServiceBus.Infra\bin\Debug\Newtonsoft.Json.dll
 C:\git\BusNeco\ServiceBus.Infra\bin\Debug\ZeroFormatter.dll
 C:\git\BusNeco\ServiceBus.Infra\bin\Debug\ZeroFormatter.Interfaces.dll
 C:\git\BusNeco\ServiceBus.Infra\bin\Debug\Newtonsoft.Json.xml
-C:\git\BusNeco\ServiceBus.Infra\obj\Debug\ServiceBus.Infra.csprojResolveAssemblyReference.cache
 C:\git\BusNeco\ServiceBus.Infra\obj\Debug\ServiceBus.Infra.dll
 C:\git\BusNeco\ServiceBus.Infra\obj\Debug\ServiceBus.Infra.pdb
+C:\git\BusNeco\ServiceBus.Infra\obj\Debug\ServiceBus.Infra.csprojAssemblyReference.cache
+C:\git\BusNeco\ServiceBus.Infra\obj\Debug\ServiceBus.Infra.csproj.CopyComplete

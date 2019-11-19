@@ -8,15 +8,16 @@ namespace TestBus.Test
     public class TradeManager : IContextHandler
     {
         [Respond("@.create")]
-        public bool Create(Trade trade)
+        public bool Create(BusMessageContext<Trade> context)
         {
+            Console.WriteLine($"CREATED {context.GetString()}");
             return true;
         }
 
         [Listen("module1.capture")]
-        public void Capture(Trade trade)
+        public void Capture(BusMessageContext<Trade> context)
         {
-            Console.WriteLine(trade);
+            Console.WriteLine(context.GetObject());
         }
     }
 }

@@ -13,7 +13,7 @@ namespace ServiceBus
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
-    
+
     public class Conector : IConector
     {
         private readonly IChannel _channel;
@@ -122,26 +122,12 @@ namespace ServiceBus
             {
                 return;
             }
-            var value = GetExpectedValue(args);
             IContextHandler obj = null;
             if (_handlerCatalog.Handlers.ContainsKey(args.HandlerType.FullName))
             {
                 obj = _handlerCatalog.Handlers[args.HandlerType.FullName];
             }
-            var parameters = new List<object>();
-            foreach (var p in args.Method.GetParameters())
-            {
-                if (args.Data.Headers != null && p.ParameterType.IsInstanceOfType(args.Data.Headers))
-                {
-                    parameters.Add(args.Data.Headers);
-                }
-                if (p.ParameterType == value.GetType())
-                {
-                    parameters.Add(value);
-                }
-            }
-            var ret = args.Method.Invoke(obj, BindingFlags.Public, null, parameters.ToArray(),
-                CultureInfo.InvariantCulture);
+            var ret = args.Method.Invoke(obj, BindingFlags.Public, null, new[] { CreateBusMessageContext(args) }, CultureInfo.InvariantCulture);
             if (ret != null && args.Data.GetHeader(CALLBACK) != null)
             {
                 Publish(args.Data.GetHeader(CALLBACK),
@@ -151,6 +137,17 @@ namespace ServiceBus
                     Guid.NewGuid().ToString(),
                     args.Data.MessageId);
             }
+        }
+
+        private IBusMessageContext CreateBusMessageContext(MessageReceivedEventArgs args)
+        {
+            var classType = typeof(BusMessageContext<>);
+            var typeParams = new Type[] { GetExpectedType(args) };
+            var constructedType = classType.MakeGenericType(typeParams);
+            var ctx = (IBusMessageContext)Activator.CreateInstance(constructedType);
+            ctx.Conector = this;
+            ctx.Data = args.Data;
+            return ctx;
         }
 
         private static MessageData CreateMessageData<T>(T data,
@@ -165,24 +162,16 @@ namespace ServiceBus
             output.CorrelationId = correlationId;
             output.Headers = new Dictionary<string, string>
             {
-                {EXPECTED_ARGUMENT_TYPE, data.GetType().Name},
+                {EXPECTED_ARGUMENT_TYPE, data.GetType().FullName},
                 {CALLBACK, callback},
                 {ACCEPT_ENCONDING, acceptEnconding?.Aggregate((c, n) => $"{c},{n}")}
             };
             return output;
         }
 
-        private static object GetExpectedValue(MessageReceivedEventArgs args)
-        {
-            var expectedArgumentType =
-                args.ExpectedArgumentType ?? Type.GetType(args.Data.GetHeader(EXPECTED_ARGUMENT_TYPE));
-            return args.Data.DecodeMessage(expectedArgumentType);
-        }
+        private static Type GetExpectedType(MessageReceivedEventArgs args) => args.ExpectedArgumentType ?? Type.GetType(args.Data.GetHeader(EXPECTED_ARGUMENT_TYPE));
 
-        public void Dispose()
-        {
-            _channel?.Close();
-        }
+        public void Dispose() => _channel?.Close();
     }
 }
 

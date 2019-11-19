@@ -24,6 +24,7 @@ C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ZeroFormatter.Interfaces.dl
 C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\ServiceBus.Infra.pdb
 C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\RabbitMQ.Client.xml
 C:\git\BusNeco\ServiceBus.Channel.RabbitMq\bin\Debug\Newtonsoft.Json.xml
-C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.csprojResolveAssemblyReference.cache
 C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.dll
 C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.pdb
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.csprojAssemblyReference.cache
+C:\git\BusNeco\ServiceBus.Channel.RabbitMq\obj\Debug\ServiceBus.Channel.RabbitMq.csproj.CopyComplete

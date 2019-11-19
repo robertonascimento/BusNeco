@@ -21,8 +21,8 @@ namespace TestBus
 
         public static void Main()
         {
-            TestUsingFile();
-            // TestUsingRabbitMQ();
+            //TestUsingFile();
+            TestUsingRabbitMQ();
         }
 
         private static void TestUsingFile()
@@ -35,7 +35,7 @@ namespace TestBus
         
         private static void TestUsingRabbitMQ()
         {
-            //Make sure your RabbitMQ service is up and runing and check Config\RabbitChannelConfig.json configuration
+            //Make sure your RabbitMQ service is up and running and check Config\RabbitChannelConfig.json configuration
             var catalog = new HandlerCatalog().AddInstance(new TradeManager()).Load();
             var conector = new Conector(new RabbitMqChannel(), MessageEncodingType.Json);
             conector.SetUp(catalog);

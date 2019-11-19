@@ -49,4 +49,6 @@ C:\git\BusNeco\Tester\bin\Debug\ServiceBus.pdb
 C:\git\BusNeco\Tester\bin\Debug\Castle.Core.xml
 C:\git\BusNeco\Tester\bin\Debug\RabbitMQ.Client.xml
 C:\git\BusNeco\Tester\bin\Debug\Newtonsoft.Json.xml
-C:\git\BusNeco\Tester\obj\Debug\TestBus.csprojResolveAssemblyReference.cache
+C:\git\BusNeco\Tester\bin\Debug\ServiceBus.dll.config
+C:\git\BusNeco\Tester\obj\Debug\TestBus.csprojAssemblyReference.cache
+C:\git\BusNeco\Tester\obj\Debug\TestBus.csproj.CopyComplete
